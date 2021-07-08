@@ -111,6 +111,7 @@
 
        :lang
        (python +lsp +mspyls)
+       (javascript +lsp)
        ;;agda              ; types of types of types of types...
        ;;beancount         ; mind the GAAP
        ;;cc                ; C > C++ == 1

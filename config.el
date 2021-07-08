@@ -38,6 +38,28 @@
 ;; numbers are disabled. For relative line numbers, set this to `relative'.
 (setq display-line-numbers-type t)
 (setq evil-want-fine-undo t)
+(use-package! pyvenv
+  :diminish
+  :demand t
+  :config
+  (setq pyvenv-workon "py38")
+  (pyvenv-tracking-mode 1))
+
+(use-package eterm-256color
+  :hook (term-mode . eterm-256color-mode))
+
+(add-hook! 'python-mode '(require 'dap-python))
+;; (setq pyvenv-default-virtual-env-name "py38")
+
+;; dap-mode javascript
+(use-package! javascript-mode
+  :mode "\\.js\\'"
+  :hook (javascript-mode . lsp-deferred)
+  :config
+  (setq javascript-indent-level 2)
+  (require 'dap-mode)
+  (require 'dap-firefox)
+  (dap-node-setup))
 
 ;; Here are some additional functions/macros that could help you configure Doom:
 ;;
