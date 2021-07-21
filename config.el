@@ -32,20 +32,26 @@
 
 ;; If you use `org' and don't want your org files in the default location below,
 ;; change `org-directory'. It must be set before org loads!
+;; (setq doom-localleader-key ".")
 (setq org-directory "~/org/")
+
+;; (setq localleader "\\")
+;; (setq evil-snipe-override-evil-repeat-keys nil)
+;; (setq doom-localleader-key "\\")
+;; (setq doom-localleader-alt-key "M-,")
 
 ;; This determines the style of line numbers in effect. If set to `nil', line
 ;; numbers are disabled. For relative line numbers, set this to `relative'.
 (setq display-line-numbers-type t)
 (setq evil-want-fine-undo t)
 (use-package! pyvenv
-  :diminish
+  :diminish pyvenv-mode
   :demand t
   :config
   (setq pyvenv-workon "py38")
   (pyvenv-tracking-mode 1))
 
-(use-package eterm-256color
+(use-package! eterm-256color
   :hook (term-mode . eterm-256color-mode))
 
 (add-hook! 'python-mode '(require 'dap-python))
@@ -79,9 +85,17 @@
 ;; they are implemented.
 
 
-;; (use-package lsp-mode
-;;   :commands (lsp lsp-deferred)
-;;   :init
-;;   (setq lsp-keymap-prefix "C-c l")
-;;   :config
-;;   (setq lsp-enable-which-key-integration t))
+(use-package! eyebrowse
+  :diminish eyebrowse-mode
+  :config (progn
+            (define-key eyebrowse-mode-map (kbd "M-1") 'eyebrowse-switch-to-window-config-1)
+            (define-key eyebrowse-mode-map (kbd "M-2") 'eyebrowse-switch-to-window-config-2)
+            (define-key eyebrowse-mode-map (kbd "M-3") 'eyebrowse-switch-to-window-config-3)
+            (define-key eyebrowse-mode-map (kbd "M-4") 'eyebrowse-switch-to-window-config-4)
+            (eyebrowse-mode t)
+            (setq eyebrowse-new-workspace t)))
+(use-package! org-sidebar
+	:custom
+		(org-sidebar-tree-jump-fn 'org-sidebar-tree-jump-source)
+)
+;; (add-hook 'org-mode-hook (lambda () (linum-mode 0)))
