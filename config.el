@@ -28,7 +28,9 @@
 ;; There are two ways to load a theme. Both assume the theme is installed and
 ;; available. You can either set `doom-theme' or manually load a theme with the
 ;; `load-theme' function. This is the default:
-(setq doom-theme 'doom-dark+)
+(setq doom-theme 'spacemacs-light)
+;; create frames maximized on startup
+(add-to-list 'initial-frame-alist '(fullscreen . maximized))
 
 ;; If you use `org' and don't want your org files in the default location below,
 ;; change `org-directory'. It must be set before org loads!
@@ -85,17 +87,12 @@
 ;; they are implemented.
 
 
-(use-package! eyebrowse
-  :diminish eyebrowse-mode
-  :config (progn
-            (define-key eyebrowse-mode-map (kbd "M-1") 'eyebrowse-switch-to-window-config-1)
-            (define-key eyebrowse-mode-map (kbd "M-2") 'eyebrowse-switch-to-window-config-2)
-            (define-key eyebrowse-mode-map (kbd "M-3") 'eyebrowse-switch-to-window-config-3)
-            (define-key eyebrowse-mode-map (kbd "M-4") 'eyebrowse-switch-to-window-config-4)
-            (eyebrowse-mode t)
-            (setq eyebrowse-new-workspace t)))
 (use-package! org-sidebar
 	:custom
 		(org-sidebar-tree-jump-fn 'org-sidebar-tree-jump-source)
 )
-;; (add-hook 'org-mode-hook (lambda () (linum-mode 0)))
+;; adding org mode settings
+;; (add-hook! 'org-mode (org-bullets-mode t) (display-line-numbers-mode 0))
+;; finally this worked, but above did not, figure out why later.
+(add-hook 'org-mode-hook (lambda () (display-line-numbers-mode 0)))
+;; (global-set-key (kbd "M 1") (+workspaces))
