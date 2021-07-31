@@ -28,7 +28,17 @@
 ;; There are two ways to load a theme. Both assume the theme is installed and
 ;; available. You can either set `doom-theme' or manually load a theme with the
 ;; `load-theme' function. This is the default:
-(setq doom-theme 'spacemacs-light)
+;; Set default font
+;; (set-face-attribute 'default nil
+;;                     :family "DroidSansMono Nerd Font"
+;;                     :height 148
+;;                     :size 14
+;;                     :weight 'normal
+;;                     :width 'normal)
+(setq doom-theme 'doom-spacegrey)
+;; fixes wierd chars in iterm eamcs
+;; Use Emacs terminfo, not system terminfo
+;; (setq system-uses-terminfo nil)
 ;; create frames maximized on startup
 (add-to-list 'initial-frame-alist '(fullscreen . maximized))
 
@@ -36,7 +46,7 @@
 ;; change `org-directory'. It must be set before org loads!
 ;; (setq doom-localleader-key ".")
 (setq org-directory "~/org/")
-
+(load! "custom_func")
 ;; (setq localleader "\\")
 ;; (setq evil-snipe-override-evil-repeat-keys nil)
 ;; (setq doom-localleader-key "\\")
@@ -88,11 +98,13 @@
 
 
 (use-package! org-sidebar
-	:custom
-		(org-sidebar-tree-jump-fn 'org-sidebar-tree-jump-source)
-)
+  :custom
+  (org-sidebar-tree-jump-fn 'org-sidebar-tree-jump-source))
 ;; adding org mode settings
 ;; (add-hook! 'org-mode (org-bullets-mode t) (display-line-numbers-mode 0))
 ;; finally this worked, but above did not, figure out why later.
 (add-hook 'org-mode-hook (lambda () (display-line-numbers-mode 0)))
+(evil-terminal-cursor-changer-activate)
 ;; (global-set-key (kbd "M 1") (+workspaces))
+;; below one doesnt work
+;; (evil-define-key 'insert 'global "jj" 'evil-normal-state)

@@ -19,6 +19,8 @@
 (package! eyebrowse :disable t)
 (package! org-bullets)
 (package! spacemacs-theme)
+(package! evil-terminal-cursor-changer)
+(package! kaolin-themes)
 ; To install a package directly from a remote git repo, you must specify a
 ;; `:recipe'. You'll find documentation on what `:recipe' accepts here:
 ;; https://github.com/raxod502/straight.el#the-recipe-format
