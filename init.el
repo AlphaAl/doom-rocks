@@ -110,7 +110,7 @@
        ;;tty               ; improve the terminal Emacs experience
 
        :lang
-       (python +lsp +mspyls)
+       (python +lsp +pyright)
        (javascript +lsp)
        ;;agda              ; types of types of types of types...
        ;;beancount         ; mind the GAAP

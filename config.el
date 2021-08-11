@@ -41,44 +41,68 @@
 ;; (setq system-uses-terminfo nil)
 ;; create frames maximized on startup
 (add-to-list 'initial-frame-alist '(fullscreen . maximized))
+;; (add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/"))
 
+;; ********************************************************************************
 ;; If you use `org' and don't want your org files in the default location below,
 ;; change `org-directory'. It must be set before org loads!
 ;; (setq doom-localleader-key ".")
 (setq org-directory "~/org/")
+;; load the custom scripts
 (load! "custom_func")
-;; (setq localleader "\\")
-;; (setq evil-snipe-override-evil-repeat-keys nil)
-;; (setq doom-localleader-key "\\")
-;; (setq doom-localleader-alt-key "M-,")
+(use-package! org-roam
+  :ensure t
+  :init
+  (setq org-roam-v2-ack t)
+  :custom
+  (org-roam-directory (file-truename "~/org/roam")
+                      (org-roam-complete-everywhere t))
+      :bind (("C-c n l" . org-roam-buffer-toggle)
+             ("C-c n f" . org-roam-node-find)
+             ("C-c n g" . org-roam-graph)
+             ("C-c n i" . org-roam-node-insert)
+             ("C-c n c" . org-roam-capture))
+      :config
+      (setq org-roam-dailies-directory (expand-file-name "~/org/daily"))
+      (org-roam-setup))
+;; Agenda should be taken from org-roam dailies folder.
+;; pretty important logic for filtering out a specific directory
+;; we filter out roam directory inside org folder since it is only a knowledge base.
+(setq org-agenda-files
+      (seq-filter (lambda(x) (not (string-match "/roam/"(file-name-directory x))))
+       (directory-files-recursively "~/org/" "\\.org$")
+       ))
+;; *********************************************************************************
 
 ;; This determines the style of line numbers in effect. If set to `nil', line
 ;; numbers are disabled. For relative line numbers, set this to `relative'.
 (setq display-line-numbers-type t)
 (setq evil-want-fine-undo t)
-(use-package! pyvenv
-  :diminish pyvenv-mode
-  :demand t
-  :config
-  (setq pyvenv-workon "py38")
-  (pyvenv-tracking-mode 1))
-
+;; needs to be fixed later on.
 (use-package! eterm-256color
+  :ensure t
   :hook (term-mode . eterm-256color-mode))
 
-(add-hook! 'python-mode '(require 'dap-python))
-;; (setq pyvenv-default-virtual-env-name "py38")
-
-;; dap-mode javascript
-(use-package! javascript-mode
-  :mode "\\.js\\'"
-  :hook (javascript-mode . lsp-deferred)
+;; decent lsp settings for multiple languages.
+(use-package! lsp-mode
+  :hook ((c-mode ; clangd
+          c-or-c++-mode ; clangd
+          java-mode ; eclipse-jdtls
+          js-mode ; typescript-language-server
+          python-mode ; pyls
+          dart-mode
+          web-mode) . lsp)
+  :commands lsp
   :config
-  (setq javascript-indent-level 2)
-  (require 'dap-mode)
-  (require 'dap-firefox)
-  (dap-node-setup))
+  (setq lsp-prefer-flymake nil)
+  (setq lsp-eldoc-hook nil)
+  (setq lsp-enable-symbol-highlighting nil)
+  (setq lsp-signature-render-documentation nil)
+  (use-package lsp-java :after lsp))
 
+(use-package! company-lsp
+  :commands company-lsp
+  :config (setq company-lsp-cache-candidates 'auto))
 ;; Here are some additional functions/macros that could help you configure Doom:
 ;;
 ;; - `load!' for loading external *.el files relative to this one
@@ -108,3 +132,41 @@
 ;; (global-set-key (kbd "M 1") (+workspaces))
 ;; below one doesnt work
 ;; (evil-define-key 'insert 'global "jj" 'evil-normal-state)
+(use-package! docker
+  :ensure t
+  :bind ("C-c d" . docker))
+;; to display workspace name in modeline
+;; (after! doom-modeline
+  ;; (setq doom-modeline-persp-name t))
+
+(setq vterm-shell "/opt/homebrew/bin/fish")
+(use-package! highlight-indent-guides
+  :init
+  (setq highlight-indent-guides-method 'character))
+(add-hook! 'prog-mode-hook 'highlight-indent-guides-mode)
+;; enable elpy only on demand
+;; (use-package! elpy
+;;   :ensure t
+;;   :init
+;;   (elpy-enable))
+(use-package! pyvenv
+  :diminish pyvenv-mode
+  :after (python-mode)
+  :config
+  (setq pyvenv-workon "py38")
+  (pyvenv-tracking-mode 1))
+
+;; setting for running jupyter with org
+;; (setq ob-async-no-async-languages-alist
+      ;; '("jupyter-python"))
+(org-babel-do-load-languages
+ 'org-babel-load-languages
+ '((emacs-lisp . t)
+   (python . t)
+   (julia . t)
+   (jupyter . t)))
+;; saving buffer using command key should put
+;; buffer in normal state.
+(map! "s-s"
+      (cmd! (save-buffer)
+            (evil-normal-state)))
