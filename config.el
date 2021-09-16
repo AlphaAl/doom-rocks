@@ -35,7 +35,7 @@
 ;;                     :size 14
 ;;                     :weight 'normal
 ;;                     :width 'normal)
-(setq doom-theme 'doom-spacegrey)
+(setq doom-theme 'doom-dracula)
 ;; fixes wierd chars in iterm eamcs
 ;; Use Emacs terminfo, not system terminfo
 ;; (setq system-uses-terminfo nil)
@@ -48,6 +48,11 @@
 ;; change `org-directory'. It must be set before org loads!
 ;; (setq doom-localleader-key ".")
 (setq org-directory "~/org/")
+;; (use-package! org
+;;   :bind
+;;   (:map org-mode-map
+;;    ("C-C-[" . nil)))
+
 ;; load the custom scripts
 (load! "custom_func")
 (use-package! org-roam
@@ -68,10 +73,75 @@
 ;; Agenda should be taken from org-roam dailies folder.
 ;; pretty important logic for filtering out a specific directory
 ;; we filter out roam directory inside org folder since it is only a knowledge base.
-(setq org-agenda-files
-      (seq-filter (lambda(x) (not (string-match "/roam/"(file-name-directory x))))
-       (directory-files-recursively "~/org/" "\\.org$")
-       ))
+;; (after! org
+;;   (setq org-agenda-files
+;;       (seq-filter (lambda(x) (not (string-match "/roam/"(file-name-directory x))))
+;;        (directory-files-recursively "~/org/" "\\.org$")
+;;        )))
+;; (setq org-agenda-file-regexp "\\`^(?!.*/roam/).*\\.org$'\\")
+(setq org-agenda-files (quote ("~/org"
+                               "~/org/daily")));; * BIBTEX setup with ORG-REF
+;; Spell checking (requires the ispell software)
+(add-hook 'bibtex-mode-hook 'flyspell-mode)
+
+;; Change fields and format
+(setq bibtex-user-optional-fields '(("keywords" "Keywords to describe the entry" "")
+                                ("file" "Link to document file." ":"))
+bibtex-include-OPTkey nil
+bibtex-align-at-equal-sign t)
+(setq-default fill-column 160)
+
+
+(setq bib-files-directory (directory-files
+                             (concat (getenv "HOME") "/Documents/references") t "^[A-Za-z].+.bib$")
+        pdf-files-directory (concat (getenv "HOME") "/Documents/pdf")
+        bib-notes-directory (concat (getenv "HOME") "/Documents/notes"))
+
+(use-package! helm-bibtex
+    :config
+    (require 'helm-config)
+    (setq bibtex-completion-bibliography bib-files-directory
+          bibtex-completion-library-path pdf-files-directory
+          bibtex-completion-pdf-field "File"
+          bibtex-completion-notes-path bib-notes-directory)
+    :bind
+    (("<menu>" . helm-command-prefix)
+     :map helm-command-map
+     ("b" . helm-bibtex)
+     ("<menu>" . helm-resume)))
+
+(use-package! org-ref
+    :config
+    (setq org-ref-completion-library 'org-ref-helm-cite
+          org-ref-get-pdf-filename-function 'org-ref-get-pdf-filename-helm-bibtex
+          org-ref-default-bibliography bib-files-directory
+          org-ref-notes-directory bib-notes-directory))
+
+;; BibLaTeX settings
+;; bibtex-mode
+(setq bibtex-dialect 'biblatex)
+(pdf-loader-install)
+;; Uses more memory; see https://github.com/politza/pdf-tools/issues/51
+
+;; (setq pdf-view-use-scaling t
+;;       pdf-view-use-imagemagick nil)
+
+
+;; (defun as/get-daily-agenda (&optional date)
+;;   "Return the agenda for the day as a string."
+;;   (interactive)
+;;   (let ((file (make-temp-file "daily-agenda" nil ".txt")))
+;;     (org-agenda nil "d" nil)
+;;     (when date (org-agenda-goto-date date))
+;;     (org-agenda-write file nil nil "*Org Agenda(d)*")
+;;     (kill-buffer)
+;;     (with-temp-buffer
+;;       (insert-file-contents file)
+;;       (goto-char (point-min))
+;;       (kill-line 2)
+;;       (while (re-search-forward "^  " nil t)
+;;         (replace-match "- " nil nil))
+;;       (buffer-string))))
 ;; *********************************************************************************
 
 ;; This determines the style of line numbers in effect. If set to `nil', line
@@ -96,7 +166,7 @@
   :config
   (setq lsp-prefer-flymake nil)
   (setq lsp-eldoc-hook nil)
-  (setq lsp-enable-symbol-highlighting nil)
+  ;; (setq lsp-enable-symbol-highlighting nil)
   (setq lsp-signature-render-documentation nil)
   (use-package lsp-java :after lsp))
 
@@ -159,14 +229,111 @@
 ;; setting for running jupyter with org
 ;; (setq ob-async-no-async-languages-alist
       ;; '("jupyter-python"))
+(require 'zmq)
+(require 'jupyter-channel)
+(require 'jupyter)
 (org-babel-do-load-languages
  'org-babel-load-languages
  '((emacs-lisp . t)
    (python . t)
    (julia . t)
+   ;;(ipython . t)
    (jupyter . t)))
+;; (org-babel-do-load-languages 'org-babel-load-languages
+;;                              (append org-babel-load-languages
+;;                               '((python     . t)
+;;                                 (ruby       . t)))
 ;; saving buffer using command key should put
 ;; buffer in normal state.
 (map! "s-s"
       (cmd! (save-buffer)
             (evil-normal-state)))
+ (add-to-list 'load-path (getenv "MU4EHOME"))
+;; (straight-use-package
+;;  '(mu4e :files (:defaults "mu4e/*.el")))
+;; ;; *****************************************
+;; (add-to-list 'load-path "/opt/homebrew/Cellar/mu/1.4.15/share/emacs/site-lisp/mu/mu4e")
+;; (require 'mu4e)
+;; (require 'smtpmail)
+;; (setq mu4e-update-interval (* 10 60))
+;; (setq mu4e-get-mail-command "mbsync -a")
+;; (setq mu4e-maildir "~/.Mail")
+
+;; (setq mu4e-contexts
+;;       (list
+;;        ;; work account
+;;        (make-mu4e-context
+;;         :name "Work"
+;;         :match-func
+;;         (lambda (msg)
+;;           (when msg
+;;             (string-prefix-p "/Gmail" (mu4e-message-field msg :maildir))))
+;;         :vars '((user-mail-address . "rahultripathi.pillarplus@gmail.com")
+;;                 (user-full-name . "Rahul Tripathi")
+;;                 (mu4e-drafts-folder . "/rahulpp-gmail/Drafts")
+;;                 (mu4e-sent-folder . "/rahulpp-gmail/Sent Mail")
+;;                 (mu4e-refile-folder . "/rahulpp-gmail/All Mail")
+;;                 (mu4e-trash-folder . "/rahulpp-gmail/Trash")
+;;                 (mu4e-maildir-shortcuts . (("/rahulpp-gmail/Inbox" . ?i)
+;;                                                    ("/rahulpp-gmail/Sent Items" . ?s)
+;;         ("/rahulpp-gmail/Drafts"     . ?d)
+;;         ("/rahulpp-gmail/Trash"      . ?t)
+;;         ("/rahulpp-gmail/All Mail"      . ?a)))))
+;;        (make-mu4e-context
+;;         :name "Personal"
+;;         :match-func
+;;         (lambda (msg)
+;;           (when msg
+;;             (string-prefix-p "/Gmail" (mu4e-message-field msg :maildir))))
+;;         :vars '((user-mail-address . "rahul.tripathi7293@gmail.com")
+;;                 (user-full-name . "Rahul Tripathi")
+;;                 (mu4e-drafts-folder . "/rahul7293-gmail/Drafts")
+;;                 (mu4e-sent-folder . "/rahul7293-gmail/Sent Mail")
+;;                 (mu4e-refile-folder . "/rahul7293-gmail/All Mail")
+;;                 (mu4e-trash-folder . "/rahul7293-gmail/Trash")
+;;                 (mu4e-maildir-shortcuts . (("/rahul7293-gmail/Inbox" . ?i)
+;;         ("/rahul7293-gmail/[Gmail].Sent Items" . ?s)
+;;         ("/rahul7293-gmail/[Gmail].Drafts"     . ?d)
+;;         ("/rahul7293-gmail/[Gmail].Trash"      . ?t)
+;;         ("/rahul7293-gmail/[Gmail].All Mail"      . ?a)))))))
+;; ;; smtp mail settings
+;; (setq message-send-mail-function  'smtpmail-send-it
+;;       smtpmail-default-smtp-server "smtp.gmail.com"
+;;       smtpmail-smtp-server  "smtp.gmail.com"
+;;       smtpmail-local-domain "gmail.com"
+;;       smtpmail-smtp-service 587
+;;       smtpmail-starttls-credentials '(("smtp.gmail.com" 587 nil nil)))
+
+;; ;; (load! "mail_settings.el")
+
+;; ;; need to check this one below
+;; ;; supposed to make the inserting password in mbsync easy.
+;; (setq mu4e~get-mail-password-regexp "^Enter password for account 'Remote': $")
+(defun rahul/workspace:switch-next()
+  (interactive)
+  ;; TODO (kill-minibuffer)
+  (+workspace:switch-next))
+(map! "C-M-<up>"
+       (cmd! (rahul/workspace:switch-next)))
+(map! "C-M-<down>"
+       (cmd! (+workspace:switch-previous)))
+(map! "C-M-n"
+       (cmd! (+workspace/new)))
+;; (map! "C-M-<backspace>"
+;;        (cmd! (+workspace/clo)))
+(map! "C-M-<right>"
+      (cmd! (next-buffer)))
+(map! "C-M-<left>"
+      (cmd! (previous-buffer)))
+(map! "C-M-\\"
+      (cmd! (ivy-switch-buffer)))
+(map! "C-M-'"
+      (cmd! (+ivy/switch-workspace-buffer)))
+(map! "C-M-<backspace>"
+      (cmd! (kill-buffer)))
+
+(setq biblio-download-directory "~/Documents/pdf/")
+(setenv "WORKON_HOME" "~/miniforge3/envs/")
+(require 'csv-mode)
+;; (org-babel-do-load-languages 'org-babel-load-languages '((dot . t))
+;; (setq gud-pdb-command-name "python -m pdb")

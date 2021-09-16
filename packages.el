@@ -19,6 +19,7 @@
 (package! eyebrowse :disable t)
 (package! org-bullets)
 (package! spacemacs-theme)
+(package! seti-theme)
 (package! evil-terminal-cursor-changer)
 (package! kaolin-themes)
 (package! org-roam)
@@ -26,6 +27,23 @@
 (package! highlight-indent-guides)
 (package! elpy)
 (package! jupyter)
+(package! org-roam-bibtex)
+(package! csv :disable t)
+(package! org-ref)
+(package! org-noter)
+(package! pdf-tools)
+(package! mu4e-views)
+(package! prettier)
+;; (package! mu4e
+;;   :recipe (
+;;            :local-repo "/opt/homebrew/Cellar/mu/1.4.15/share/emacs/site-lisp/mu/mu4e"
+;;            ;; pre-build must be disabled when using the nix derivation - in part
+;;            ;; because it is alreadt built, but also because the directory is
+;;            ;; read-only because that's how nix likes to do things.
+;;            :pre-build ()
+;;            )
+;;   :disable t)
+;; (package! mu4e :disable t)
 ; To install a package directly from a remote git repo, you must specify a
 ;; `:recipe'. You'll find documentation on what `:recipe' accepts here:
 ;; https://github.com/raxod502/straight.el#the-recipe-format
