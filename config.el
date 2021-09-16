@@ -35,7 +35,7 @@
 ;;                     :size 14
 ;;                     :weight 'normal
 ;;                     :width 'normal)
-(setq doom-theme 'doom-dracula)
+(setq doom-theme 'kaolin-galaxy)
 ;; fixes wierd chars in iterm eamcs
 ;; Use Emacs terminfo, not system terminfo
 ;; (setq system-uses-terminfo nil)
@@ -332,6 +332,11 @@ bibtex-align-at-equal-sign t)
 (map! "C-M-<backspace>"
       (cmd! (kill-buffer)))
 
+(xterm-mouse-mode 1)
+(map! "<mouse-5>"
+      (cmd! (scroll-up-line)))
+(map! "<mouse-4>"
+      (cmd! (scroll-down-line)))
 (setq biblio-download-directory "~/Documents/pdf/")
 (setenv "WORKON_HOME" "~/miniforge3/envs/")
 (require 'csv-mode)
